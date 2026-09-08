@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { Activity, TimeSession } from "@/core/types"
 import { loadUserData, createActivity as dbCreateActivity, updateActivity as dbUpdateActivity, deleteActivity as dbDeleteActivity, createSession as dbCreateSession } from "@/core/db/dexieServices"
+import { nanoid } from "nanoid"
 
 interface AppStore {
   activities: Activity[]
@@ -33,7 +34,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set({
       activities: data.activities,
       sessions: data.sessions,
-      currentActivity: data.activities[0] ?? null,
       isLoading: false
     })
   },
@@ -82,7 +82,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
     const endTime = Date.now()
     const newSession: TimeSession = {
-      id: crypto.randomUUID(),
+      id: nanoid(),
       activityId: currentActivity.id,
       startTime: endTime - durationInSeconds * 1000,
       endTime,

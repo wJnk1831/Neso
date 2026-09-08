@@ -4,9 +4,11 @@ import { useAppStore } from "@/core/store/useAppStore"
 import { Activity } from "@/core/types"
 import { Bolt, ChevronDown, ChevronUp, Plus, X } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
+import Timer from "./components/Timer"
+import { formatDuration } from "@/core/utils/utils"
 
 export default function Home() {
-  const { activities, setCurrentActivity, createActivity, updateActivity, } = useAppStore()
+  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions } = useAppStore()
 
   const [search, setSearch] = useState("")
   const [toggleDropDown, setToggleDropDown] = useState(false)
@@ -25,6 +27,12 @@ export default function Home() {
       activity.name.toLowerCase().includes(query)
     )
   }, [activities, search])
+
+  const editingActivityTotalTime = useMemo(() => {
+    if (!editingActivity?.id) return 0
+
+    return sessions.filter((session) => session.activityId === editingActivity.id).reduce((acc, session) => acc + session.duration, 0)
+  }, [editingActivity, sessions])
 
   useEffect(() => {
     function handleMouseDown(e: MouseEvent) {
@@ -85,7 +93,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#F4F2F3] px-4 py-6 text-[#14121F]">
+    <main className="min-h-screen w-full bg-[#F4F2F3] px-4 py-6 text-[#14121F]">
       <nav className="flex w-full justify-center select-none text-[#232323]">
         <div
           ref={dropDownRef}
@@ -121,6 +129,7 @@ export default function Home() {
                   key={activity.id}
                   onClick={() => {
                     setCurrentActivity(activity)
+                    setSearch(activity.name)
                     setToggleDropDown(false)
                   }}
                   className="group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-[#F4F2F3]"
@@ -189,9 +198,7 @@ export default function Home() {
               </button>
             </div>
 
-            <form
-              onSubmit={handleSaveActivity}
-              className="flex flex-col gap-5" >
+            <form onSubmit={handleSaveActivity} className="flex flex-col gap-5" >
               <div>
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
                   Activity Name
@@ -211,6 +218,17 @@ export default function Home() {
                   placeholder="e.g. Study Next.js"
                 />
               </div>
+              {editingActivity.id && (
+                <div>
+                  <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
+                    Total time
+                  </span>
+                  <div className="w-full rounded-xl border border-[#232323]/10 bg-[#F4F2F3] px-4 py-3 text-sm font-medium text-[#14121F]">
+                    {formatDuration(editingActivityTotalTime)}
+                  </div>
+                </div>
+              )}
+
 
               <div className="mt-1 flex justify-end gap-2 border-t border-[#232323]/6 pt-5">
                 <button
@@ -228,10 +246,18 @@ export default function Home() {
                   Save
                 </button>
               </div>
+
             </form>
+
           </div>
         </div>
       )}
-    </div>
+
+      <div className="flex items-center justify-center">
+        {!currentActivity?.name && <span className="mt-20 text-3xl font-extrabold opacity-30 select-none">Select one activity</span>}
+        {currentActivity?.id && <Timer />}
+      </div>
+
+    </main>
   )
 }
