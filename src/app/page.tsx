@@ -8,7 +8,7 @@ import Timer from "./components/Timer"
 import { formatDuration } from "@/core/utils/utils"
 
 export default function Home() {
-  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions } = useAppStore()
+  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions, deleteActivity } = useAppStore()
 
   const [search, setSearch] = useState("")
   const [toggleDropDown, setToggleDropDown] = useState(false)
@@ -83,13 +83,24 @@ export default function Home() {
         name: editingActivity.name,
         color: editingActivity.color,
       })
+      setSearch("")
+
     } else {
       createActivity(editingActivity.name, editingActivity.color)
+      // setCurrentActivity(editingActivity)
+      setSearch(editingActivity.name)
     }
 
     setIsModalOpen(false)
     setEditingActivity(null)
-    setSearch("")
+  }
+
+  function handleDeleteActivity() {
+    if (editingActivity && editingActivity.id) {
+      deleteActivity(editingActivity.id)
+      setSearch('')
+      setIsModalOpen(false)
+    }
   }
 
   return (
@@ -157,7 +168,7 @@ export default function Home() {
                 </div>
               ))}
 
-              {search.trim().length > 0 && (
+              {search.trim().length > 0 && filteredActivities.length === 0 && (
                 <button
                   type="button"
                   onClick={() => handleOpenCreate(search)}
@@ -230,21 +241,30 @@ export default function Home() {
               )}
 
 
-              <div className="mt-1 flex justify-end gap-2 border-t border-[#232323]/6 pt-5">
+              <div className="mt-1 flex justify-between gap-2 border-t border-[#232323]/6 pt-5">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="cursor-pointer rounded-xl border border-[#232323]/10 bg-[#FFFFFF] px-4 py-2.5 text-sm font-semibold text-[#232323] transition-colors hover:bg-[#F4F2F3]"
+                  onClick={() => handleDeleteActivity()}
+                  className="cursor-pointer  rounded-xl border border-[#ca0606]/10  px-4 py-2.5 text-sm font-semibold text-[#ca0606] transition-colors hover:bg-[#ca0606]/10"
                 >
-                  Cancel
+                  Delete
                 </button>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="cursor-pointer rounded-xl border border-[#232323]/10 bg-[#FFFFFF] px-4 py-2.5 text-sm font-semibold text-[#232323] transition-colors hover:bg-[#F4F2F3]"
+                  >
+                    Cancel
+                  </button>
 
-                <button
-                  type="submit"
-                  className="cursor-pointer rounded-xl bg-[#14121F] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] transition-colors hover:bg-[#232323]"
-                >
-                  Save
-                </button>
+                  <button
+                    type="submit"
+                    className="cursor-pointer rounded-xl bg-[#14121F] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] transition-colors hover:bg-[#232323]"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
 
             </form>
