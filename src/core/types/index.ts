@@ -1,9 +1,19 @@
+export type LogType = "SESSION_START" | "SESSION_END" | "PAUSE" | "RESUME" | "NOTE"
+
+export interface SessionLog {
+  id: string
+  timestamp: number
+  relativeTime: number
+  type: LogType
+  note?: string
+}
 export interface TimeSession {
   id: string
   activityId: string
   startTime: number
-  endTime: number 
+  endTime: number
   duration: number
+  logs: SessionLog[]
 }
 
 export interface Activity {

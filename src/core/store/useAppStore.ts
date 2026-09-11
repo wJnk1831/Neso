@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Activity, TimeSession } from "@/core/types"
+import { Activity, SessionLog, TimeSession } from "@/core/types"
 import { loadUserData, createActivity as dbCreateActivity, updateActivity as dbUpdateActivity, deleteActivity as dbDeleteActivity, createSession as dbCreateSession } from "@/core/db/dexieServices"
 import { nanoid } from "nanoid"
 
@@ -16,7 +16,7 @@ interface AppStore {
   createActivity: (name: string, color?: string) => void
   updateActivity: (id: string, changes: Partial<Omit<Activity, "id">>) => void
   deleteActivity: (id: string) => void
-  addSession: (durationInSeconds: number) => void
+  addSession: (durationInSeconds: number, logs: SessionLog[]) => void
   setTempActivity: (value: Partial<Activity>) => void
 }
 
@@ -76,7 +76,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     dbDeleteActivity(id)
   },
 
-  addSession: (durationInSeconds) => {
+  addSession: (durationInSeconds, logs) => {
     const { currentActivity } = get()
     if (!currentActivity || durationInSeconds <= 0) return
 
@@ -86,11 +86,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
       activityId: currentActivity.id,
       startTime: endTime - durationInSeconds * 1000,
       endTime,
-      duration: durationInSeconds
+      duration: durationInSeconds,
+      logs
     }
 
     set((state) => ({ sessions: [...state.sessions, newSession] }))
-
     dbCreateSession(newSession)
   },
 

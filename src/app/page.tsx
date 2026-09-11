@@ -273,7 +273,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center">
         {!currentActivity?.name && <span className="mt-20 text-3xl font-extrabold opacity-30 select-none">Select one activity</span>}
         {currentActivity?.id && <Timer />}
       </div>

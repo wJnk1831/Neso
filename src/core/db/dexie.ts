@@ -7,7 +7,7 @@ class NesoTrackerDB extends Dexie {
 
   constructor() {
     super("NesoTrackerDB")
-    this.version(1).stores({
+    this.version(2).stores({
       activities: "id, name, createdAt",
       sessions: "id, activityId, startTime, endTime"
     })
