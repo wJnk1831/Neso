@@ -18,6 +18,12 @@ interface AppStore {
   deleteActivity: (id: string) => void
   addSession: (durationInSeconds: number, logs: SessionLog[]) => void
   setTempActivity: (value: Partial<Activity>) => void
+
+  // Derived selectors
+  getTotalTime: (activityId: string) => number
+  getSessionsByActivity: (activityId: string) => TimeSession[]
+  getTotalTimeAll: () => number
+  getLastSession: (activityId: string) => TimeSession | null
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -95,6 +101,30 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   setTempActivity: (value) => set({ tempActivity: value }),
+
+  // Derived selectors
+  getTotalTime: (activityId) => {
+    return get().sessions
+      .filter((s) => s.activityId === activityId)
+      .reduce((acc, s) => acc + s.duration, 0)
+  },
+
+  getSessionsByActivity: (activityId) => {
+    return get().sessions
+      .filter((s) => s.activityId === activityId)
+      .sort((a, b) => a.startTime - b.startTime)
+  },
+
+  getTotalTimeAll: () => {
+    return get().sessions.reduce((acc, s) => acc + s.duration, 0)
+  },
+
+  getLastSession: (activityId) => {
+    const sessions = get().sessions
+      .filter((s) => s.activityId === activityId)
+      .sort((a, b) => b.startTime - a.startTime)
+    return sessions.length > 0 ? sessions[0] : null
+  },
 }))
 
 if (typeof window !== "undefined") { useAppStore.getState().initStore() }

@@ -2,19 +2,21 @@
 
 import { useAppStore } from "@/core/store/useAppStore"
 import { Activity } from "@/core/types"
-import { Bolt, ChevronDown, ChevronUp, Plus, X } from "lucide-react"
+import { Bolt, ChevronDown, ChevronUp, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Timer from "./components/Timer"
 import { formatDuration } from "@/core/utils/utils"
+import ActivityFormModal from "./components/ActivityFormModal"
 
 export default function Home() {
-  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions, deleteActivity } = useAppStore()
+  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions, deleteActivity, getTotalTime } = useAppStore()
 
   const [search, setSearch] = useState("")
   const [toggleDropDown, setToggleDropDown] = useState(false)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingActivity, setEditingActivity] = useState<{ id?: string, name: string, color?: string } | null>(null)
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null)
+  const [initialName, setInitialName] = useState("")
 
   const dropDownRef = useRef<HTMLDivElement | null>(null)
 
@@ -27,12 +29,6 @@ export default function Home() {
       activity.name.toLowerCase().includes(query)
     )
   }, [activities, search])
-
-  const editingActivityTotalTime = useMemo(() => {
-    if (!editingActivity?.id) return 0
-
-    return sessions.filter((session) => session.activityId === editingActivity.id).reduce((acc, session) => acc + session.duration, 0)
-  }, [editingActivity, sessions])
 
   useEffect(() => {
     function handleMouseDown(e: MouseEvent) {
@@ -50,12 +46,9 @@ export default function Home() {
     }
   }, [])
 
-  function handleOpenCreate(initialName?: string) {
-    setEditingActivity({
-      name: initialName || search,
-      color: "#3b82f6",
-    })
-
+  function handleOpenCreate(name?: string) {
+    setEditingActivity(null)
+    setInitialName(name || search)
     setToggleDropDown(false)
     setIsModalOpen(true)
   }
@@ -63,44 +56,35 @@ export default function Home() {
   function handleOpenEdit(e: React.MouseEvent, activity: Activity) {
     e.stopPropagation()
 
-    setEditingActivity({
-      id: activity.id,
-      name: activity.name,
-      color: activity.color,
-    })
-
+    setEditingActivity(activity)
+    setInitialName("")
     setToggleDropDown(false)
     setIsModalOpen(true)
   }
 
-  function handleSaveActivity(e: React.FormEvent) {
-    e.preventDefault()
-
-    if (!editingActivity || !editingActivity.name.trim()) return
-
-    if (editingActivity.id) {
+  function handleSave(data: { name: string; color?: string }) {
+    if (editingActivity) {
       updateActivity(editingActivity.id, {
-        name: editingActivity.name,
-        color: editingActivity.color,
+        name: data.name,
+        color: data.color,
       })
       setSearch("")
-
     } else {
-      createActivity(editingActivity.name, editingActivity.color)
-      // setCurrentActivity(editingActivity)
-      setSearch(editingActivity.name)
+      createActivity(data.name, data.color)
+      setSearch(data.name)
     }
 
     setIsModalOpen(false)
     setEditingActivity(null)
+    setInitialName("")
   }
 
-  function handleDeleteActivity() {
-    if (editingActivity && editingActivity.id) {
-      deleteActivity(editingActivity.id)
-      setSearch('')
-      setIsModalOpen(false)
-    }
+  function handleDelete(id: string) {
+    deleteActivity(id)
+    setSearch('')
+    setIsModalOpen(false)
+    setEditingActivity(null)
+    setInitialName("")
   }
 
   return (
@@ -191,87 +175,19 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Create/Edit Modal*/}
-      {isModalOpen && editingActivity && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#14121F]/45 p-4 backdrop-blur-[2px]">
-          <div className="w-full max-w-md rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-6 shadow-[0_20px_60px_rgba(20,18,31,0.18)]">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold tracking-tight text-[#14121F]">
-                {editingActivity.id ? "Edit Activity" : "New Activity"}
-              </h2>
-
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="cursor-pointer rounded-lg p-1.5 text-[#232323]/35 transition-colors hover:bg-[#F4F2F3] hover:text-[#14121F]"
-              >
-                <X size={19} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveActivity} className="flex flex-col gap-5" >
-              <div>
-                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
-                  Activity Name
-                </label>
-
-                <input
-                  type="text"
-                  required
-                  value={editingActivity.name}
-                  onChange={(e) =>
-                    setEditingActivity({
-                      ...editingActivity,
-                      name: e.target.value,
-                    })
-                  }
-                  className="w-full rounded-xl border border-[#232323]/10 bg-[#F4F2F3] px-4 py-3 text-sm font-medium text-[#14121F] outline-none transition-all placeholder:text-[#232323]/35 focus:border-[#14121F]/20 focus:bg-[#FFFFFF] focus:ring-4 focus:ring-[#E9EAFF]"
-                  placeholder="e.g. Study Next.js"
-                />
-              </div>
-              {editingActivity.id && (
-                <div>
-                  <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
-                    Total time
-                  </span>
-                  <div className="w-full rounded-xl border border-[#232323]/10 bg-[#F4F2F3] px-4 py-3 text-sm font-medium text-[#14121F]">
-                    {formatDuration(editingActivityTotalTime)}
-                  </div>
-                </div>
-              )}
-
-
-              <div className="mt-1 flex justify-between gap-2 border-t border-[#232323]/6 pt-5">
-                <button
-                  type="button"
-                  onClick={() => handleDeleteActivity()}
-                  className="cursor-pointer  rounded-xl border border-[#ca0606]/10  px-4 py-2.5 text-sm font-semibold text-[#ca0606] transition-colors hover:bg-[#ca0606]/10"
-                >
-                  Delete
-                </button>
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="cursor-pointer rounded-xl border border-[#232323]/10 bg-[#FFFFFF] px-4 py-2.5 text-sm font-semibold text-[#232323] transition-colors hover:bg-[#F4F2F3]"
-                  >
-                    Cancel
-                  </button>
-
-                  <button
-                    type="submit"
-                    className="cursor-pointer rounded-xl bg-[#14121F] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] transition-colors hover:bg-[#232323]"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-
-            </form>
-
-          </div>
-        </div>
-      )}
+      <ActivityFormModal
+        open={isModalOpen}
+        activity={editingActivity}
+        initialName={initialName}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingActivity(null)
+          setInitialName("")
+        }}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        totalTime={editingActivity ? getTotalTime(editingActivity.id) : 0}
+      />
 
       <div className="flex flex-col items-center justify-center">
         {!currentActivity?.name && <span className="mt-20 text-3xl font-extrabold opacity-30 select-none">Select one activity</span>}
