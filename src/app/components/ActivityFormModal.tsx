@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { Activity } from "@/core/types"
 import { formatDuration } from "@/core/utils/utils"
@@ -32,17 +32,18 @@ export default function ActivityFormModal({
 }: ActivityFormModalProps) {
   const [name, setName] = useState("")
   const [color, setColor] = useState<string | undefined>(undefined)
-  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (activity) {
-      setName(activity.name)
-      setColor(activity.color)
-    } else {
-      setName(initialName || "")
-      setColor(PRESET_COLORS[0])
+    if (open) {
+      if (activity) {
+        setName(activity.name)
+        setColor(activity.color)
+      } else {
+        setName(initialName || "")
+        setColor(PRESET_COLORS[0])
+      }
     }
-  }, [activity, initialName, open])
+  }, [open, activity, initialName])
 
   if (!open) return null
 
@@ -58,10 +59,7 @@ export default function ActivityFormModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#14121F]/45 p-4 backdrop-blur-[2px]">
-      <div
-        ref={modalRef}
-        className="w-full max-w-md rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-6 shadow-[0_20px_60px_rgba(20,18,31,0.18)]"
-      >
+      <div className="w-full max-w-md rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-6 shadow-[0_20px_60px_rgba(20,18,31,0.18)]">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight text-[#14121F]">
             {activity ? "Edit Activity" : "New Activity"}

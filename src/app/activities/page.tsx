@@ -4,7 +4,6 @@ import ActivityCard from "./components/ActivityCard";
 import { useAppStore } from "@/core/store/useAppStore";
 import { useState } from "react";
 import { Activity } from "@/core/types";
-import { formatDuration } from "@/core/utils/utils";
 import ActivityFormModal from "@/app/components/ActivityFormModal";
 
 export default function Activities() {
