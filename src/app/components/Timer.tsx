@@ -77,22 +77,21 @@ export default function Timer() {
     }
   }
 
-
   return (
     <section className="mt-8 flex w-full max-w-7xl flex-col items-center justify-center rounded-2xl p-8 select-none">
       {/* Header */}
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[10px] font-bold tracking-widest text-[#232323]/40 uppercase">
+        <span className="text-[10px] font-bold tracking-widest text-text-muted uppercase">
           Atividade Atual
         </span>
-        <h1 className="text-4xl font-extrabold tracking-wide text-[#14121F]">
+        <h1 className="text-4xl font-extrabold tracking-wide text-foreground">
           {currentActivity?.name || "Nenhuma atividade selecionada"}
         </h1>
       </div>
 
       {/* Timer Display */}
-      <div className="my-6 flex items-center justify-center rounded-2xl border border-[#232323]/20 bg-[#FFFFFF] px-10 py-6 shadow-[0_4px_20px_rgba(20,18,31,0.05)]">
-        <span className="font-mono text-6xl font-black tracking-tight text-[#14121F]">
+      <div className="my-6 flex items-center justify-center rounded-2xl border border-border-strong bg-card px-10 py-6 shadow">
+        <span className="font-mono text-6xl font-black tracking-tight text-foreground">
           {formatDuration(totalSeconds)}
         </span>
       </div>
@@ -103,7 +102,7 @@ export default function Timer() {
           <button
             type="button"
             onClick={handleStart}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#14121F] py-3 text-xs font-semibold text-white transition-colors hover:bg-[#232323]"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent py-3 text-xs font-semibold text-card transition-colors hover:bg-accent-hover"
           >
             <Play size={16} />
             Iniciar Sessão
@@ -115,7 +114,7 @@ export default function Timer() {
             <button
               type="button"
               onClick={handleResumeAndPause}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#14121F] py-3 text-xs font-semibold text-white transition-colors hover:bg-[#232323]"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent py-3 text-xs font-semibold text-card transition-colors hover:bg-accent-hover"
             >
               {isRunning ? <Pause size={16} /> : <Play size={16} />}
               {isRunning ? "Pausar" : "Retomar"}
@@ -124,7 +123,7 @@ export default function Timer() {
             <button
               type="button"
               onClick={handleRestart}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#232323]/10 bg-white py-3 text-xs font-semibold text-[#14121F] transition-colors hover:bg-[#F4F2F3]"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-xs font-semibold text-foreground transition-colors hover:bg-elevated"
             >
               <RotateCwFadingClock size={16} />
               Reiniciar
@@ -136,7 +135,7 @@ export default function Timer() {
           <button
             type="button"
             onClick={handleFinishSession}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-600/90 py-3 text-xs font-semibold text-white transition-colors hover:bg-red-600"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-danger py-3 text-xs font-semibold text-card transition-colors hover:opacity-90"
           >
             <Square size={16} />
             Salvar Sessão

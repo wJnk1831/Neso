@@ -31,7 +31,7 @@ export default function Activities() {
   }
 
   return (
-    <main className="max-h-screen pt-12 gap-4 w-full bg-[#F4F2F3] px-4 py-6 text-[#14121F] overflow-y-auto overflow-x-hidden">
+    <main className="max-h-screen pt-12 gap-4 w-full bg-background px-4 py-6 text-foreground overflow-y-auto overflow-x-hidden">
       <Masonry
         items={activities}
         config={{

@@ -1,15 +1,18 @@
 "use client"
 
-import { CalendarClock, ChartColumn, House } from "lucide-react"
-
-import Image from "next/image"
-
-import Link from "next/link"
-
+import { CalendarClock, ChartColumn, House, PanelLeft, PanelRight } from "lucide-react"
+import { useThemeStore } from "@/core/store/useThemeStore"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
+import Link from "next/link"
+import ThemeToggle from "./ThemeToggle"
 
 export default function AsideComponent() {
   const pathname = usePathname()
+  const collapsed = useThemeStore((state) => state.sidebarCollapsed)
+  const toggleSidebar = useThemeStore((state) => state.toggleSidebar)
+  const darkMode = useThemeStore((state) => state.darkMode)
+
 
   const asideLinks = [
     {
@@ -18,7 +21,7 @@ export default function AsideComponent() {
       icon: <House className="w-5 h-5" />,
     },
     {
-      option: "Activites",
+      option: "Activities",
       url: "/activities",
       icon: <CalendarClock className="w-5 h-5" />,
     },
@@ -30,17 +33,27 @@ export default function AsideComponent() {
   ]
 
   return (
-    <nav className="flex h-screen w-[15%] flex-col gap-10 border-r border-[#232323]/6 bg-[#FFFFFF] p-5 text-[#232323]">
-      <div className="flex items-center gap-2 px-2">
-        <Image src="/neso-icon.png" alt="" width={40} height={40} className="rounded-xl" />
-
-        <span className="text-2xl font-extrabold tracking-tight text-[#14121F]">
-          Neso
-        </span>
+    <nav
+      className={`flex h-screen flex-col border-r border-border bg-card p-4 text-text-secondary transition-all duration-300 ease-in-out ${collapsed ? "w-20" : "w-64"
+        }`}
+    >
+      <div className="flex items-center justify-between">
+        {!collapsed && (
+          <div className="flex items-center gap-2 px-2">
+            <Image src={`${darkMode ? '/neso-icon-darkMode.png' : '/neso-icon.png'}`} alt="" width={36} height={36} className="rounded-xl" />
+            <span className="text-2xl font-extrabold tracking-tight text-foreground">
+              Neso
+            </span>
+          </div>
+        )}
+        {collapsed && (
+          <div className="flex items-center justify-center">
+            <Image src={`${darkMode ? '/neso-icon-darkMode.png' : '/neso-icon.png'}`} alt="" width={36} height={36} className="rounded-xl" />
+          </div>
+        )}
       </div>
 
-      {/* Navigation */}
-      <section className="flex flex-col gap-1">
+      <section className="mt-6 flex flex-col gap-1">
         {asideLinks.map((i) => {
           const active = i.url === pathname
 
@@ -48,16 +61,37 @@ export default function AsideComponent() {
             <Link
               key={i.option}
               href={i.url}
-              className={`group flex w-full items-center gap-3 rounded-xl px-3.5 py-3 transition-all ${active ? "bg-[#14121F] text-[#FFFFFF] shadow-[0_5px_15px_rgba(20,18,31,0.12)]" : "text-[#232323]/65 hover:bg-[#F4F2F3] hover:text-[#14121F]"}`} >
-              <div className={`flex items-center justify-center transition-colors ${active ? "text-[#E9EAFF]" : "text-[#14121F] group-hover:text-[#14121F]"}`} >
+              title={collapsed ? i.option : undefined}
+              className={`group flex items-center gap-3 rounded-xl px-3 py-3 transition-all ${active
+                ? "bg-accent text-card shadow-[0_5px_15px_rgba(20,18,31,0.12)]"
+                : "text-text-secondary hover:bg-elevated hover:text-foreground"
+                } ${collapsed ? "justify-center px-0" : ""}`}
+            >
+              <div
+                className={`flex items-center justify-center transition-colors ${active ? "text-card/70" : "text-text-secondary group-hover:text-foreground"}`}
+              >
                 {i.icon}
               </div>
 
-              <span className="text-sm font-semibold">{i.option}</span>
+              {!collapsed && (
+                <span className="text-sm font-semibold">{i.option}</span>
+              )}
             </Link>
           )
         })}
       </section>
+
+      <div className="mt-auto flex flex-col gap-3">
+        <ThemeToggle />
+
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className="flex h-10 w-full cursor-pointer items-center justify-center rounded-xl border border-border bg-input text-text-secondary transition-all hover:bg-elevated hover:text-foreground"
+        >
+          {collapsed ? <PanelRight size={18} /> : <PanelLeft size={18} />}
+        </button>
+      </div>
     </nav>
   )
 }

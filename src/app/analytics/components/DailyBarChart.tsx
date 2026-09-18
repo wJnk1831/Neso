@@ -12,41 +12,42 @@ interface DailyBarChartProps {
 export default function DailyBarChart({ data }: DailyBarChartProps) {
   if (data.length === 0 || data.every((d) => d.tempo === 0)) {
     return (
-      <div className="flex h-75 items-center justify-center rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] text-sm text-[#232323]/40">
+      <div className="flex h-[300px] items-center justify-center rounded-2xl border border-border bg-card text-sm text-text-muted">
         Sem dados no periodo selecionado
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-5 shadow-[0_4px_20px_rgba(20,18,31,0.05)]">
-      <h3 className="mb-4 text-base font-bold text-[#14121F]">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow">
+      <h3 className="mb-4 text-base font-bold text-foreground">
         Tempo por dia
       </h3>
       <ResponsiveContainer width="100%" height={260}>
         <BarChart data={data} barSize={16}>
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 10, fill: "#6b7280" }}
+            tick={{ fontSize: 10, fill: "var(--text-muted)" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: "#6b7280" }}
+            tick={{ fontSize: 10, fill: "var(--text-muted)" }}
             axisLine={false}
             tickLine={false}
-            tickFormatter={(v: any) => formatShort(Number(v) || 0)}
+            tickFormatter={(value: any) => formatShort(Number(value) || 0)} // eslint-disable-line @typescript-eslint/no-explicit-any
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid rgba(35,35,35,0.1)",
+              backgroundColor: "var(--bg-card)",
+              border: "1px solid var(--border)",
               borderRadius: "12px",
               fontSize: "12px",
+              color: "var(--text-primary)",
             }}
-            formatter={(value: any) => [formatDuration(Number(value) || 0), "Tempo"]}
+            formatter={(value: any) => [formatDuration(Number(value) || 0), "Tempo"]} // eslint-disable-line @typescript-eslint/no-explicit-any
           />
-          <Bar dataKey="tempo" fill="#14121F" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="tempo" fill="var(--accent)" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

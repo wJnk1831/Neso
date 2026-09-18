@@ -22,14 +22,18 @@ export default function Analytics() {
   const totalSessions = filteredSessions.length
   const avgPerSession = totalSessions > 0 ? Math.round(totalDuration / totalSessions) : 0
 
-  const activityStats = activities.map((a) => {
-    const actSessions = filteredSessions.filter((s) => s.activityId === a.id)
-    const dur = actSessions.reduce((acc, s) => acc + s.duration, 0)
-    return { activity: a, duration: dur, sessions: actSessions.length }
-  }).sort((a, b) => b.duration - a.duration)
+  const activityStats = activities
+    .map((a) => {
+      const actSessions = filteredSessions.filter((s) => s.activityId === a.id)
+      const dur = actSessions.reduce((acc, s) => acc + s.duration, 0)
+      return { activity: a, duration: dur, sessions: actSessions.length }
+    })
+    .sort((a, b) => b.duration - a.duration)
 
   const topActivity = activityStats.length > 0 ? activityStats[0] : null
-  const pieData = activityStats.filter((s) => s.duration > 0).map((s) => ({ name: s.activity.name, value: s.duration, color: s.activity.color }))
+  const pieData = activityStats
+    .filter((s) => s.duration > 0)
+    .map((s) => ({ name: s.activity.name, value: s.duration, color: s.activity.color }))
 
   const dailyData = buildDailyData(filteredSessions, period)
 
@@ -41,14 +45,13 @@ export default function Analytics() {
   ]
 
   return (
-    <main className="flex h-screen w-full flex-col overflow-hidden bg-[#F4F2F3] px-4 py-6 text-[#14121F]">
-      <div className="mb-6 shrink-0 flex flex-col gap-4">
+    <main className="min-h-screen w-full bg-background px-4 py-6 text-foreground">
+      <div className="mb-6 flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#14121F]">
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
             Analytics
           </h1>
-
-          <p className="text-sm text-[#232323]/55">
+          <p className="text-sm text-text-muted">
             Estatisticas do seu trackeamento de tempo
           </p>
         </div>
@@ -59,8 +62,8 @@ export default function Analytics() {
               key={p.key}
               onClick={() => setPeriod(p.key)}
               className={`cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold transition-colors ${period === p.key
-                  ? "bg-[#14121F] text-[#FFFFFF]"
-                  : "border border-[#232323]/10 bg-[#FFFFFF] text-[#232323] hover:bg-[#F4F2F3]"
+                ? "bg-accent text-card"
+                : "border border-border bg-card text-text-secondary hover:bg-elevated"
                 }`}
             >
               {p.label}
@@ -69,28 +72,25 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="shrink-0 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
           label="Tempo total"
           value={formatDuration(totalDuration)}
           icon={<Clock className="h-5 w-5" />}
           color="bg-blue-500/10 text-blue-600"
         />
-
         <SummaryCard
           label="Sessoes"
           value={String(totalSessions)}
           icon={<Hash className="h-5 w-5" />}
           color="bg-emerald-500/10 text-emerald-600"
         />
-
         <SummaryCard
           label="Media por sessao"
           value={formatDuration(avgPerSession)}
           icon={<TrendingUp className="h-5 w-5" />}
           color="bg-violet-500/10 text-violet-600"
         />
-
         <SummaryCard
           label="Atividade topo"
           value={topActivity ? topActivity.activity.name : "—"}
@@ -99,16 +99,13 @@ export default function Analytics() {
         />
       </div>
 
-      <div className="mt-6 shrink-0 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ActivityPieChart data={pieData} />
         <DailyBarChart data={dailyData} />
       </div>
 
-      <div className="mt-6 min-h-0 flex-1">
-        <RecentSessions
-          sessions={filteredSessions}
-          activities={activities}
-        />
+      <div className="mt-6">
+        <RecentSessions sessions={filteredSessions} activities={activities} />
       </div>
     </main>
   )

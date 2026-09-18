@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { X } from "lucide-react"
 import { Activity } from "@/core/types"
 import { formatDuration } from "@/core/utils/utils"
@@ -21,6 +21,18 @@ const PRESET_COLORS = [
   "#14121F", "#6b7280",
 ]
 
+interface FormState {
+  name: string
+  color: string | undefined
+}
+
+function buildInitialState(activity: Activity | null, initialName?: string): FormState {
+  if (activity) {
+    return { name: activity.name, color: activity.color }
+  }
+  return { name: initialName || "", color: PRESET_COLORS[0] }
+}
+
 export default function ActivityFormModal({
   open,
   activity,
@@ -30,27 +42,25 @@ export default function ActivityFormModal({
   onDelete,
   totalTime,
 }: ActivityFormModalProps) {
-  const [name, setName] = useState("")
-  const [color, setColor] = useState<string | undefined>(undefined)
-
-  useEffect(() => {
-    if (open) {
-      if (activity) {
-        setName(activity.name)
-        setColor(activity.color)
-      } else {
-        setName(initialName || "")
-        setColor(PRESET_COLORS[0])
-      }
-    }
-  }, [open, activity, initialName])
+  const formKey = activity ? `edit-${activity.id}` : `create-${initialName || ""}`
+  const [formState, setFormState] = useState<FormState>(() =>
+    buildInitialState(activity, initialName)
+  )
 
   if (!open) return null
 
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFormState((prev) => ({ ...prev, name: e.target.value }))
+  }
+
+  function handleColorSelect(c: string) {
+    setFormState((prev) => ({ ...prev, color: c }))
+  }
+
   function handleSave(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim()) return
-    onSave({ name: name.trim(), color })
+    if (!formState.name.trim()) return
+    onSave({ name: formState.name.trim(), color: formState.color })
   }
 
   function handleDelete() {
@@ -58,39 +68,43 @@ export default function ActivityFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#14121F]/45 p-4 backdrop-blur-[2px]">
-      <div className="w-full max-w-md rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-6 shadow-[0_20px_60px_rgba(20,18,31,0.18)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 p-4 backdrop-blur-[2px]">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-lg">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold tracking-tight text-[#14121F]">
+          <h2 className="text-lg font-bold tracking-tight text-foreground">
             {activity ? "Edit Activity" : "New Activity"}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="cursor-pointer rounded-lg p-1.5 text-[#232323]/35 transition-colors hover:bg-[#F4F2F3] hover:text-[#14121F]"
+            className="cursor-pointer rounded-lg p-1.5 text-text-disabled transition-colors hover:bg-elevated hover:text-foreground"
           >
             <X size={19} />
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="flex flex-col gap-5">
+        <form
+          key={formKey}
+          onSubmit={handleSave}
+          className="flex flex-col gap-5"
+        >
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               Activity Name
             </label>
             <input
               type="text"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-[#232323]/10 bg-[#F4F2F3] px-4 py-3 text-sm font-medium text-[#14121F] outline-none transition-all placeholder:text-[#232323]/35 focus:border-[#14121F]/20 focus:bg-[#FFFFFF] focus:ring-4 focus:ring-[#E9EAFF]"
+              value={formState.name}
+              onChange={handleNameChange}
+              className="w-full rounded-xl border border-border bg-input px-4 py-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-text-disabled focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-soft"
               placeholder="e.g. Study Next.js"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
+            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               Color
             </label>
             <div className="flex flex-wrap gap-2.5">
@@ -98,8 +112,8 @@ export default function ActivityFormModal({
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setColor(c)}
-                  className={`h-8 w-8 rounded-full border-2 transition-all ${color === c ? "border-[#14121F] scale-110" : "border-transparent"}`}
+                  onClick={() => handleColorSelect(c)}
+                  className={`h-8 w-8 rounded-full border-2 transition-all ${formState.color === c ? "border-accent scale-110" : "border-transparent"}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -108,21 +122,21 @@ export default function ActivityFormModal({
 
           {activity && (
             <div>
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-[#232323]/55">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 Total time
               </span>
-              <div className="w-full rounded-xl border border-[#232323]/10 bg-[#F4F2F3] px-4 py-3 text-sm font-medium text-[#14121F]">
+              <div className="w-full rounded-xl border border-border bg-input px-4 py-3 text-sm font-medium text-foreground">
                 {formatDuration(totalTime)}
               </div>
             </div>
           )}
 
-          <div className="mt-1 flex justify-between gap-2 border-t border-[#232323]/6 pt-5">
+          <div className="mt-1 flex justify-between gap-2 border-t border-border pt-5">
             {activity ? (
               <button
                 type="button"
                 onClick={handleDelete}
-                className="cursor-pointer rounded-xl border border-[#ca0606]/10 px-4 py-2.5 text-sm font-semibold text-[#ca0606] transition-colors hover:bg-[#ca0606]/10"
+                className="cursor-pointer rounded-xl border border-danger/20 px-4 py-2.5 text-sm font-semibold text-danger transition-colors hover:bg-danger-bg"
               >
                 Delete
               </button>
@@ -131,13 +145,13 @@ export default function ActivityFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="cursor-pointer rounded-xl border border-[#232323]/10 bg-[#FFFFFF] px-4 py-2.5 text-sm font-semibold text-[#232323] transition-colors hover:bg-[#F4F2F3]"
+                className="cursor-pointer rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-elevated"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="cursor-pointer rounded-xl bg-[#14121F] px-5 py-2.5 text-sm font-semibold text-[#FFFFFF] transition-colors hover:bg-[#232323]"
+                className="cursor-pointer rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-card transition-colors hover:bg-accent-hover"
               >
                 Save
               </button>

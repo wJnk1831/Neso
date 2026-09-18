@@ -2,14 +2,13 @@
 
 import { useAppStore } from "@/core/store/useAppStore"
 import { Activity } from "@/core/types"
-import { Bolt, ChevronDown, ChevronUp, Plus } from "lucide-react"
+import { Bolt, ChevronDown, ChevronUp, Clock, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Timer from "./components/Timer"
-import { formatDuration } from "@/core/utils/utils"
 import ActivityFormModal from "./components/ActivityFormModal"
 
 export default function Home() {
-  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, sessions, deleteActivity, getTotalTime } = useAppStore()
+  const { activities, setCurrentActivity, createActivity, updateActivity, currentActivity, deleteActivity, getTotalTime } = useAppStore()
 
   const [search, setSearch] = useState("")
   const [toggleDropDown, setToggleDropDown] = useState(false)
@@ -88,11 +87,11 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-[#F4F2F3] px-4 py-6 text-[#14121F]">
-      <nav className="flex w-full justify-center select-none text-[#232323]">
+    <main className="min-h-screen w-full bg-background px-4 py-6 text-(--text-primary)">
+      <nav className="flex w-full justify-center select-none text-text-secondary">
         <div
           ref={dropDownRef}
-          className="relative flex w-full max-w-150 rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] shadow-[0_4px_20px_rgba(20,18,31,0.05)] transition-all"
+          className="relative flex w-full max-w-150 rounded-2xl border border-border bg-card shadow transition-all"
         >
           <input
             value={search}
@@ -101,7 +100,7 @@ export default function Home() {
               setToggleDropDown(true)
             }}
             onFocus={() => setToggleDropDown(true)}
-            className="w-full rounded-2xl bg-transparent px-5 py-3.5 text-sm font-medium text-[#14121F] outline-none placeholder:text-[#232323]/40"
+            className="w-full rounded-2xl bg-transparent px-5 py-3.5 text-sm font-medium text-foreground outline-none placeholder:text-text-disabled"
             type="text"
             spellCheck={false}
             maxLength={40}
@@ -111,14 +110,14 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setToggleDropDown((prev) => !prev)}
-            className="mr-1 flex cursor-pointer items-center justify-center rounded-xl px-3 text-[#232323]/45 transition-colors hover:bg-[#F4F2F3] hover:text-[#14121F]"
+            className="mr-1 flex cursor-pointer items-center justify-center rounded-xl px-3 text-text-disabled transition-colors hover:bg-elevated hover:text-foreground"
           >
             {toggleDropDown ? (<ChevronUp size={19} strokeWidth={2} />) : (<ChevronDown size={19} strokeWidth={2} />)}
           </button>
 
           {/* Dropdown Menu */}
           {toggleDropDown && (
-            <div className="absolute left-0 top-full z-10 mt-2 flex max-h-60 w-full flex-col overflow-y-auto rounded-2xl border border-[#232323]/10 bg-[#FFFFFF] p-1.5 shadow-[0_12px_35px_rgba(20,18,31,0.12)]">
+            <div className="absolute left-0 top-full z-10 mt-2 flex max-h-60 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-card p-1.5 shadow-hover">
               {filteredActivities.map((activity) => (
                 <div
                   key={activity.id}
@@ -127,17 +126,17 @@ export default function Home() {
                     setSearch(activity.name)
                     setToggleDropDown(false)
                   }}
-                  className="group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-[#F4F2F3]"
+                  className="group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-elevated"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div
                       className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{
-                        backgroundColor: activity.color || "#E9EAFF",
+                        backgroundColor: activity.color || "var(--accent-soft)",
                       }}
                     />
 
-                    <span className="truncate text-sm font-medium text-[#14121F]">
+                    <span className="truncate text-sm font-medium text-foreground">
                       {activity.name}
                     </span>
                   </div>
@@ -145,7 +144,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={(e) => handleOpenEdit(e, activity)}
-                    className="ml-2 cursor-pointer rounded-lg p-1.5 text-[#232323]/35 opacity-0 transition-all hover:bg-[#E9EAFF] hover:text-[#14121F] group-hover:opacity-100"
+                    className="ml-2 cursor-pointer rounded-lg p-1.5 text-text-disabled opacity-0 transition-all hover:bg-accent-soft hover:text-foreground group-hover:opacity-100"
                   >
                     <Bolt width={17} height={17} />
                   </button>
@@ -156,15 +155,15 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => handleOpenCreate(search)}
-                  className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-xl border-t border-[#232323]/6 px-3 py-3 text-left text-sm font-medium text-[#14121F] transition-colors hover:bg-[#E9EAFF]"
+                  className="mt-1 flex w-full cursor-pointer items-center gap-2 rounded-xl border-t border-border px-3 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-accent-soft"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#14121F] text-[#FFFFFF]">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-card">
                     <Plus size={15} />
                   </span>
 
                   <span>
                     Create{" "}
-                    <span className="font-semibold text-[#232323]">
+                    <span className="font-semibold text-text-secondary">
                       {search}
                     </span>
                   </span>
@@ -190,8 +189,58 @@ export default function Home() {
       />
 
       <div className="flex flex-col items-center justify-center">
-        {!currentActivity?.name && <span className="mt-20 text-3xl font-extrabold opacity-30 select-none">Select one activity</span>}
-        {currentActivity?.id && <Timer />}
+        {!currentActivity?.id ? (
+          <div className="mt-12 w-full max-w-2xl">
+            <div className="flex flex-col items-center gap-6 rounded-3xl border border-border bg-card p-10 text-center shadow">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-elevated">
+                <Clock size={40} className="text-text-muted" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <h2 className="text-3xl font-extrabold tracking-tight text-text-secondary">
+                  Pronto para rastrear?
+                </h2>
+                <p className="max-w-md text-sm leading-relaxed text-text-muted">
+                  Selecione uma atividade existente no campo acima ou crie uma nova para
+                  iniciar a contagem do tempo.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {activities.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const first = activities[0]
+                      setCurrentActivity(first)
+                      setSearch(first.name)
+                      setToggleDropDown(true)
+                    }}
+                    className="cursor-pointer rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-card transition-colors hover:bg-accent-hover"
+                  >
+                    Selecionar primeira atividade
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreate()}
+                  className="cursor-pointer rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-elevated"
+                >
+                  Nova atividade
+                </button>
+              </div>
+
+              {activities.length > 0 && (
+                <p className="text-xs text-text-disabled">
+                  {activities.length} {activities.length === 1 ? "atividade registrada" : "atividades registradas"}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <Timer />
+        )}
       </div>
 
     </main>
