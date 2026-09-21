@@ -16,13 +16,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${montserrat.variable} h-full antialiased`}>
+    <html lang="pt" className={`${montserrat.variable} h - full antialiased`}>
       <body className="min-h-full flex">
         <ThemeRegistry>
           <AsideComponent />
-          {children}
+          <main className="min-w-0 flex-1 pb-16 md:pb-0">
+            {children}
+          </main>
         </ThemeRegistry>
       </body>
     </html>
-  );
+  )
 }

@@ -78,13 +78,13 @@ export default function Timer() {
   }
 
   return (
-    <section className="mt-8 flex w-full max-w-7xl flex-col items-center justify-center rounded-2xl p-8 select-none">
+    <section className="mt-8 flex w-full max-w-7xl flex-col items-center justify-center rounded-2xl md:p-8 select-none">
       {/* Header */}
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[10px] font-bold tracking-widest text-text-muted uppercase">
+        <span className="text-[10px]  font-bold tracking-widest text-text-muted uppercase">
           Atividade Atual
         </span>
-        <h1 className="text-4xl font-extrabold tracking-wide text-foreground">
+        <h1 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide text-foreground">
           {currentActivity?.name || "Nenhuma atividade selecionada"}
         </h1>
       </div>
@@ -97,7 +97,7 @@ export default function Timer() {
       </div>
 
       {/* Controls */}
-      <div className="flex w-full max-w-md flex-col items-center justify-center gap-3">
+      <div className="flex w-full max-w-md flex-col items-center justify-center gap-3 ">
         {totalSeconds === 0 && !isRunning && (
           <button
             type="button"

@@ -87,7 +87,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-background px-4 py-6 text-(--text-primary)">
+    <main className=" w-full bg-background px-4 py-6 text-(--text-primary)">
       <nav className="flex w-full justify-center select-none text-text-secondary">
         <div
           ref={dropDownRef}

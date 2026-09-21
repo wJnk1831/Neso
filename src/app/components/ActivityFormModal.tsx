@@ -68,7 +68,7 @@ export default function ActivityFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 p-4 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4 backdrop-blur-[2px]">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-lg">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold tracking-tight text-foreground">
