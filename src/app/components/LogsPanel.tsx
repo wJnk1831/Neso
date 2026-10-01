@@ -71,7 +71,7 @@ export default function LogsPanel({ logs, logNoteInput, setLogNoteInput, handleC
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
           <h3 className="text-base font-bold text-foreground">
-            Session Logs & Milestones
+            Registros de sessão & Milestones
           </h3>
           <p className="text-xs text-text-muted">
             Registro cronológico das ações e anotações

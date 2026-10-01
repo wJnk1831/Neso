@@ -98,7 +98,7 @@ export default function ActivityFormModal({
               value={formState.name}
               onChange={handleNameChange}
               className="w-full rounded-xl border border-border bg-input px-4 py-3 text-sm font-medium text-foreground outline-none transition-all placeholder:text-text-disabled focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-soft"
-              placeholder="e.g. Study Next.js"
+              placeholder="Ex Estudos da faculdade"
               autoFocus
             />
           </div>

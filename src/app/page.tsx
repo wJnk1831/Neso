@@ -87,7 +87,7 @@ export default function Home() {
   }
 
   return (
-    <main className=" w-full bg-background px-4 py-6 text-(--text-primary)">
+    <main className="w-full bg-background px-4 py-6 text-(--text-primary)">
       <nav className="flex w-full justify-center select-none text-text-secondary">
         <div
           ref={dropDownRef}
@@ -104,7 +104,7 @@ export default function Home() {
             type="text"
             spellCheck={false}
             maxLength={40}
-            placeholder="Select activity..."
+            placeholder="Selecione uma atividade"
           />
 
           <button
@@ -117,7 +117,7 @@ export default function Home() {
 
           {/* Dropdown Menu */}
           {toggleDropDown && (
-            <div className="absolute left-0 top-full z-10 mt-2 flex max-h-60 w-full flex-col overflow-y-auto rounded-2xl border border-border bg-card p-1.5 shadow-hover">
+            <div className="absolute left-0 top-full z-10 mt-2 flex max-h-60 w-full flex-col overflow-y-auto roud rounded-b-2xl border border-border bg-card p-1.5 shadow-hover">
               {filteredActivities.map((activity) => (
                 <div
                   key={activity.id}
@@ -169,6 +169,7 @@ export default function Home() {
                   </span>
                 </button>
               )}
+              {filteredActivities.length === 0 && search.trim().length === 0 && <span className="text-sm opacity-35 text-center">Ainda não há atividades</span>}
             </div>
           )}
         </div>
