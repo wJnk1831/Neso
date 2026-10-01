@@ -59,7 +59,7 @@ export default function AsideComponent() {
             <Image
               src={
                 darkMode
-                  ? "/neso-icon-darkMode.png"
+                  ? "/neso-icon-darkmode.png"
                   : "/neso-icon.png"
               }
               alt="Neso"
