@@ -27,11 +27,6 @@ export default function AsideComponent() {
       icon: <House className="h-5 w-5" />,
     },
     {
-      option: "Atividades",
-      url: "/activities",
-      icon: <CalendarClock className="h-5 w-5" />,
-    },
-    {
       option: "Estatísticas",
       url: "/analytics",
       icon: <ChartColumn className="h-5 w-5" />,

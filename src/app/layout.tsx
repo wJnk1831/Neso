@@ -12,6 +12,9 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Neso - Time Tracker",
   description: "Time tracker",
+  icons: {
+    icon: "/neso-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
