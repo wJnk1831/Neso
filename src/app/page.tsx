@@ -4,9 +4,9 @@ import { useAppStore } from "@/core/store/useAppStore"
 import { Activity } from "@/core/types"
 import { ArrowLeft, Bolt, ChevronDown, ChevronUp, Clock, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import Timer from "./components/Timer"
-import ActivityGrid from "./components/activity/ActivityGrid"
-import ActivityFormModal from "./components/ActivityFormModal"
+import Timer from "@/components/features/timer/Timer"
+import ActivityGrid from "@/components/features/activity/ActivityGrid"
+import ActivityFormModal from "@/components/features/activity/ActivityFormModal"
 
 export default function Home() {
   const {

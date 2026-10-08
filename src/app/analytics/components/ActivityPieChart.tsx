@@ -13,7 +13,7 @@ interface ActivityPieChartProps {
 export default function ActivityPieChart({ data }: ActivityPieChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center rounded-2xl border border-border bg-card text-sm text-text-muted">
+      <div className="flex h-75 items-center justify-center rounded-2xl border border-border bg-card text-sm text-text-muted">
         Sem dados no periodo selecionado
       </div>
     )
