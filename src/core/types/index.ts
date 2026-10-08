@@ -23,6 +23,15 @@ export interface Activity {
   createdAt: number
 }
 
+export interface ActiveRun {
+  id: string
+  activityId: string
+  startedAt: number
+  accumulatedMs: number
+  runningSince: number | null
+  logs: SessionLog[]
+}
+
 export interface UserData {
   id: string
   activities: Activity[]

@@ -2,54 +2,68 @@
 
 import { useAppStore } from "@/core/store/useAppStore"
 import { Play, Pause, Square, RotateCwFadingClock } from "lucide-react"
-import { useState } from "react"
-import { useStopwatch } from "react-timer-hook"
+import { useEffect, useState } from "react"
 import LogsPanel from "./LogsPanel"
-import { LogType, SessionLog } from "@/core/types"
-import { nanoid } from "nanoid"
+import { LogType } from "@/core/types"
 
 export default function Timer() {
-  const { currentActivity, addSession } = useAppStore()
-  const [startTime, setStartTime] = useState<number | null>(null)
+  const {
+    activities,
+    currentActivity,
+    activeRun,
+    startRun,
+    pauseRun,
+    resumeRun,
+    resetRun,
+    finishRun,
+    addRunLog,
+  } = useAppStore()
 
-  const [logs, setLogs] = useState<SessionLog[]>([])
   const [logNoteInput, setLogNoteInput] = useState("")
+  const [now, setNow] = useState(() => Date.now())
 
-  const { totalSeconds, totalMilliseconds, isRunning, start, pause, reset } = useStopwatch({ autoStart: false })
+  const isRunning = !!activeRun && activeRun.runningSince !== null
+  const totalSeconds = activeRun
+    ? Math.max(0,
+      Math.floor(
+        (activeRun.accumulatedMs +
+          (activeRun.runningSince ? now - activeRun.runningSince : 0)) /
+        1000
+      )
+    ) : 0
+
+  const displayActivity = activeRun
+    ? (activities.find((a) => a.id === activeRun.activityId) ?? null)
+    : currentActivity
+
+  useEffect(() => {
+    if (!activeRun?.runningSince) return
+
+    const interval = setInterval(() => setNow(Date.now()), 500)
+    return () => clearInterval(interval)
+  }, [activeRun?.runningSince])
 
   function handleStart() {
-    if (!startTime) {
-      setStartTime(Date.now())
-    }
-    start()
-
-    handleCreateNewLog("SESSION_START")
+    if (!currentActivity) return
+    startRun(currentActivity.id)
   }
 
   function handleRestart() {
-    reset(undefined, false)
-    setLogs([])
+    resetRun()
   }
 
   function handleResumeAndPause() {
+    if (!activeRun) return
     if (isRunning) {
-      pause()
-      handleCreateNewLog("PAUSE")
+      pauseRun()
     } else {
-      start()
-      handleCreateNewLog("RESUME")
+      resumeRun()
     }
   }
 
   function handleFinishSession() {
-    if (!currentActivity || totalSeconds === 0) return
-    handleCreateNewLog("SESSION_END")
-
-    addSession(totalSeconds, logs)
-
-    pause()
-    reset(undefined, false)
-    setStartTime(null)
+    if (!activeRun) return
+    finishRun()
   }
 
   function formatDuration(total: number) {
@@ -59,21 +73,14 @@ export default function Timer() {
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`
   }
 
-  function handleCreateNewLog(type: LogType,) {
+  function handleCreateNewLog(type: LogType) {
+    if (!activeRun) return
     if (type === "NOTE" && !logNoteInput.trim()) return
 
-    const newLog: SessionLog = {
-      id: nanoid(),
-      timestamp: Date.now(),
-      type,
-      relativeTime: totalSeconds,
-      ...(type === "NOTE" && logNoteInput ? { note: logNoteInput } : {})
-    }
-
-    setLogs((prev) => [...prev, newLog])
+    addRunLog(type, logNoteInput)
 
     if (type === "NOTE") {
-      setLogNoteInput('')
+      setLogNoteInput("")
     }
   }
 
@@ -85,7 +92,7 @@ export default function Timer() {
           Atividade Atual
         </span>
         <h1 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide text-foreground">
-          {currentActivity?.name || "Nenhuma atividade selecionada"}
+          {displayActivity?.name || "Nenhuma atividade selecionada"}
         </h1>
       </div>
 
@@ -109,7 +116,7 @@ export default function Timer() {
           </button>
         )}
 
-        {(isRunning || totalMilliseconds > 0) && (
+        {(isRunning || totalSeconds > 0) && (
           <div className="flex w-full items-center justify-center gap-3">
             <button
               type="button"
@@ -145,8 +152,7 @@ export default function Timer() {
 
       {/* Logs Panel */}
       <LogsPanel
-        logs={logs}
-        setLogs={setLogs}
+        logs={activeRun?.logs ?? []}
         logNoteInput={logNoteInput}
         setLogNoteInput={setLogNoteInput}
         handleCreateNewLog={handleCreateNewLog}

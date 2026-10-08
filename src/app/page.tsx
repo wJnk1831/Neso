@@ -15,6 +15,7 @@ export default function Home() {
     createActivity,
     updateActivity,
     currentActivity,
+    activeRun,
     deleteActivity,
     getTotalTime,
   } = useAppStore()
@@ -213,7 +214,7 @@ export default function Home() {
       <div className="mt-12 flex w-full flex-col items-center">
         {activities.length === 0 ? (
           <EmptyState onCreate={() => handleOpenCreate()} />
-        ) : currentActivity ? (
+        ) : currentActivity || activeRun ? (
           <Timer />
         ) : (
           <ActivityGrid

@@ -1,5 +1,7 @@
 import { db } from "./dexie"
-import { Activity, TimeSession } from "@/core/types"
+import { Activity, TimeSession, ActiveRun } from "@/core/types"
+
+export const ACTIVE_RUN_ID = "active-run"
 
 export async function loadUserData() {
   const [activities, sessions] = await Promise.all([
@@ -7,6 +9,18 @@ export async function loadUserData() {
     db.sessions.toArray()
   ])
   return { activities, sessions }
+}
+
+export async function loadRunningSession(): Promise<ActiveRun | null> {
+  return (await db.runningSession.get(ACTIVE_RUN_ID)) ?? null
+}
+
+export async function saveRunningSession(run: ActiveRun | null) {
+  if (run) {
+    await db.runningSession.put({ ...run, id: ACTIVE_RUN_ID })
+  } else {
+    await db.runningSession.delete(ACTIVE_RUN_ID)
+  }
 }
 
 export async function createActivity(activity: Activity) {
