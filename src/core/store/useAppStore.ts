@@ -8,11 +8,13 @@ interface AppStore {
   sessions: TimeSession[]
   currentActivity: Activity | null
   activeRun: ActiveRun | null
+  search: string
   isLoading: boolean
   tempActivity: Partial<Activity> | null,
 
   initStore: () => Promise<void>
   setCurrentActivity: (activity: Activity | null) => void
+  setSearch: (value: string) => void
 
   createActivity: (name: string, color?: string) => void
   updateActivity: (id: string, changes: Partial<Omit<Activity, "id">>) => void
@@ -57,6 +59,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   sessions: [],
   currentActivity: null,
   activeRun: null,
+  search: "",
   isLoading: true,
   tempActivity: null,
 
@@ -73,10 +76,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
         ? savedRun
         : null
 
+    const restoredActivity = activeRun
+      ? (data.activities.find((a) => a.id === activeRun.activityId) ?? null)
+      : null
+
     set({
       activities: data.activities,
       sessions: data.sessions,
       activeRun,
+      currentActivity: restoredActivity,
+      search: restoredActivity?.name ?? "",
       isLoading: false,
     })
 
@@ -84,8 +93,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   setCurrentActivity: (activity) => {
-    set({ currentActivity: activity })
+    set({ currentActivity: activity, search: activity?.name ?? "" })
   },
+
+  setSearch: (value) => set({ search: value }),
 
   createActivity: (name, color) => {
     const newActivity: Activity = {
@@ -105,7 +116,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
       currentActivity:
         state.currentActivity?.id === id
           ? { ...state.currentActivity, ...changes }
-          : state.currentActivity
+          : state.currentActivity,
+      ...(state.currentActivity?.id === id && changes.name !== undefined
+        ? { search: changes.name }
+        : {}),
     }))
 
     dbUpdateActivity(id, changes)
@@ -113,12 +127,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   deleteActivity: (id) => {
     const wasRunning = get().activeRun?.activityId === id
+    const wasSelected = get().currentActivity?.id === id
 
     set((state) => ({
       activities: state.activities.filter((a) => a.id !== id),
       sessions: state.sessions.filter((s) => s.activityId !== id),
       currentActivity: state.currentActivity?.id === id ? null : state.currentActivity,
-      activeRun: state.activeRun?.activityId === id ? null : state.activeRun
+      activeRun: state.activeRun?.activityId === id ? null : state.activeRun,
+      ...(wasSelected ? { search: "" } : {}),
     }))
 
     if (wasRunning) persistRun(null)

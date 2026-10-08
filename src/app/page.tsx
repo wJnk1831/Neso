@@ -2,7 +2,7 @@
 
 import { useAppStore } from "@/core/store/useAppStore"
 import { Activity } from "@/core/types"
-import { Bolt, ChevronDown, ChevronUp, Clock, Plus } from "lucide-react"
+import { ArrowLeft, Bolt, ChevronDown, ChevronUp, Clock, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import Timer from "./components/Timer"
 import ActivityGrid from "./components/activity/ActivityGrid"
@@ -16,11 +16,12 @@ export default function Home() {
     updateActivity,
     currentActivity,
     activeRun,
+    search,
+    setSearch,
     deleteActivity,
     getTotalTime,
   } = useAppStore()
 
-  const [search, setSearch] = useState("")
   const [toggleDropDown, setToggleDropDown] = useState(false)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -28,6 +29,8 @@ export default function Home() {
   const [initialName, setInitialName] = useState("")
 
   const dropDownRef = useRef<HTMLDivElement | null>(null)
+
+  const canGoBack = !!currentActivity && !activeRun
 
   const filteredActivities = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -77,8 +80,6 @@ export default function Home() {
         name: data.name,
         color: data.color,
       })
-
-      setSearch("")
     } else {
       createActivity(data.name, data.color)
       setSearch(data.name)
@@ -91,7 +92,6 @@ export default function Home() {
 
   function handleDelete(id: string) {
     deleteActivity(id)
-    setSearch("")
     setIsModalOpen(false)
     setEditingActivity(null)
     setInitialName("")
@@ -102,8 +102,23 @@ export default function Home() {
       <nav className="flex w-full justify-center select-none text-text-secondary">
         <div
           ref={dropDownRef}
-          className="relative flex w-full max-w-150 rounded-2xl border border-border bg-card shadow transition-all"
+          className="relative flex w-full max-w-150 items-center rounded-2xl border border-border bg-card shadow transition-all"
         >
+          {canGoBack && (
+            <button
+              type="button"
+              onClick={() => {
+                setCurrentActivity(null)
+                setToggleDropDown(false)
+              }}
+              title="Voltar para as atividades"
+              aria-label="Voltar para as atividades"
+              className="ml-1 flex shrink-0 cursor-pointer items-center justify-center rounded-xl p-2 text-text-disabled transition-colors hover:bg-elevated hover:text-foreground"
+            >
+              <ArrowLeft size={19} />
+            </button>
+          )}
+
           <input
             value={search}
             onChange={(e) => {
@@ -137,7 +152,6 @@ export default function Home() {
                   key={activity.id}
                   onClick={() => {
                     setCurrentActivity(activity)
-                    setSearch(activity.name)
                     setToggleDropDown(false)
                   }}
                   className="group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-elevated"
