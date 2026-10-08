@@ -42,12 +42,39 @@ export default function ActivityFormModal({
   onDelete,
   totalTime,
 }: ActivityFormModalProps) {
-  const formKey = activity ? `edit-${activity.id}` : `create-${initialName || ""}`
+  if (!open) return null
+
+  return (
+    <ActivityFormModalContent
+      key={activity ? `edit-${activity.id}` : `create-${initialName || ""}`}
+      activity={activity}
+      initialName={initialName}
+      onClose={onClose}
+      onSave={onSave}
+      onDelete={onDelete}
+      totalTime={totalTime}
+    />
+  )
+}
+
+function ActivityFormModalContent({
+  activity,
+  initialName,
+  onClose,
+  onSave,
+  onDelete,
+  totalTime,
+}: {
+  activity: Activity | null
+  initialName?: string
+  onClose: () => void
+  onSave: (data: { name: string; color?: string }) => void
+  onDelete: (id: string) => void
+  totalTime: number
+}) {
   const [formState, setFormState] = useState<FormState>(() =>
     buildInitialState(activity, initialName)
   )
-
-  if (!open) return null
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormState((prev) => ({ ...prev, name: e.target.value }))
@@ -84,7 +111,6 @@ export default function ActivityFormModal({
         </div>
 
         <form
-          key={formKey}
           onSubmit={handleSave}
           className="flex flex-col gap-5"
         >
